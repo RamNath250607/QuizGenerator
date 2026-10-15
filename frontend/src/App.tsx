@@ -18,7 +18,7 @@ import {
   type DocumentExtractionMeta
 } from './services/api';
 import type { QuizData, QuizScoreSummary } from './types/quiz';
-import { ArrowRight, ArrowLeft, CheckCircle2, BookOpen, FileText } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle2, BookOpen, FileText, AlertCircle } from 'lucide-react';
 
 export function App() {
   // Theme & Navigation
@@ -32,6 +32,7 @@ export function App() {
   const [extractionMeta, setExtractionMeta] = useState<DocumentExtractionMeta | null>(null);
   const [isExtracting, setIsExtracting] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const [topic, setTopic] = useState<string>('DBMS & SQL');
 
@@ -82,6 +83,7 @@ export function App() {
     setSelectedFile(file);
     setExtractionMeta(null);
     setUploadError(null);
+    setValidationError(null);
 
     if (!file) {
       if (backendOnline) {
@@ -115,17 +117,19 @@ export function App() {
     }
   };
 
-  // Validation before proceeding to Quiz Parameters
+  // Validation before proceeding to Quiz Parameters (Step 2)
   const handleProceedToConfig = () => {
     if (quizMode === 'document' && !selectedFile) {
-      alert('Please upload a document (PDF, DOCX, or TXT) before configuring the quiz.');
+      setValidationError('Please upload a PDF/DOCX/TXT file or click "Load Sample Lecture Notes" above to proceed.');
       return;
     }
     if (quizMode === 'topic' && !topic.trim()) {
-      alert('Please enter or select a topic before proceeding.');
+      setValidationError('Please enter or select a study topic before continuing.');
       return;
     }
+    setValidationError(null);
     setStep(2);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Launch AI Quiz Generator
@@ -198,7 +202,6 @@ export function App() {
     setScoreSummary(summary);
     setStep(4);
 
-    // Save attempt into SQLite database
     if (backendOnline) {
       saveQuizAttemptToBackend({
         title: activeQuiz.title,
@@ -233,32 +236,46 @@ export function App() {
             {(step === 1 || step === 2) && (
               <div className="pt-8 pb-4 max-w-4xl mx-auto">
                 <div className="flex items-center justify-between border-b border-indigo-100 dark:border-slate-800 pb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                  {/* Step 1 Pill */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setValidationError(null);
+                      setStep(1);
+                    }}
+                    className="flex items-center space-x-3 cursor-pointer group"
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
                       step === 1 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30' : 'bg-emerald-500 text-white'
                     }`}>
                       {step > 1 ? '✓' : '1'}
                     </div>
-                    <span className={`text-sm font-bold ${step === 1 ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500'}`}>
+                    <span className={`text-sm font-bold transition-colors ${step === 1 ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 group-hover:text-indigo-600'}`}>
                       1. Study Material
                     </span>
-                  </div>
+                  </button>
 
                   <div className="h-0.5 flex-1 mx-4 bg-slate-200 dark:bg-slate-700" />
 
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                      step === 2 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                  {/* Step 2 Pill (Clickable) */}
+                  <button
+                    type="button"
+                    onClick={handleProceedToConfig}
+                    className="flex items-center space-x-3 cursor-pointer group"
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
+                      step === 2 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 group-hover:bg-indigo-100'
                     }`}>
                       2
                     </div>
-                    <span className={`text-sm font-bold ${step === 2 ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500'}`}>
+                    <span className={`text-sm font-bold transition-colors ${step === 2 ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 group-hover:text-indigo-600'}`}>
                       2. Quiz Settings
                     </span>
-                  </div>
+                  </button>
 
                   <div className="h-0.5 flex-1 mx-4 bg-slate-200 dark:bg-slate-700" />
 
+                  {/* Step 3 Pill */}
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-200 dark:bg-slate-700 text-slate-500">
                       3
@@ -288,7 +305,10 @@ export function App() {
 
                   <ModeSelector
                     selectedMode={quizMode}
-                    onSelectMode={setQuizMode}
+                    onSelectMode={(mode) => {
+                      setValidationError(null);
+                      setQuizMode(mode);
+                    }}
                   />
                 </div>
 
@@ -313,8 +333,21 @@ export function App() {
                   ) : (
                     <TopicSelectorCard
                       topic={topic}
-                      onTopicChange={setTopic}
+                      onTopicChange={(t) => {
+                        setValidationError(null);
+                        setTopic(t);
+                      }}
                     />
+                  )}
+
+                  {/* Inline Validation Alert Banner */}
+                  {validationError && (
+                    <div className="mt-6 flex items-center space-x-3 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 animate-in fade-in duration-200">
+                      <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                      <div className="text-xs sm:text-sm font-semibold">
+                        {validationError}
+                      </div>
+                    </div>
                   )}
 
                   {/* Continue Button */}
@@ -326,7 +359,7 @@ export function App() {
                           {quizMode === 'document'
                             ? selectedFile
                               ? `Ready: "${selectedFile.name}" ${extractionMeta ? `(${extractionMeta.word_count} words)` : ''}`
-                              : 'Upload a document above to proceed'
+                              : 'Upload a document above or click "Load Sample Notes" to proceed'
                             : `Ready: "${topic || 'Select a topic'}"`}
                         </span>
                       </h4>
@@ -350,10 +383,13 @@ export function App() {
 
             {/* STEP 2: Configure Quiz Settings */}
             {step === 2 && (
-              <div className="max-w-4xl mx-auto px-4 mt-6">
+              <div className="max-w-4xl mx-auto px-4 mt-6 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between mb-6">
                   <button
-                    onClick={() => setStep(1)}
+                    onClick={() => {
+                      setValidationError(null);
+                      setStep(1);
+                    }}
                     className="inline-flex items-center space-x-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition-colors cursor-pointer"
                   >
                     <ArrowLeft className="w-4 h-4" />
@@ -413,7 +449,7 @@ export function App() {
             )}
           </>
         ) : (
-          /* History & Learning Analytics Tab (Milestone 11) */
+          /* History & Learning Analytics Tab */
           <HistoryView
             onStartNewQuiz={() => {
               setActiveTab('create');

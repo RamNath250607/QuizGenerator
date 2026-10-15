@@ -120,6 +120,22 @@ export const DocumentUploadCard: React.FC<DocumentUploadCardProps> = ({
               TXT
             </span>
           </div>
+
+          <div className="mt-4 pt-3 border-t border-indigo-100 dark:border-slate-700">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                const sampleText = `Operating Systems & Database Systems: Comprehensive Lecture Notes\n\n1. Process Management and CPU Scheduling\nA process is a program in execution. The operating system manages processes using a Process Control Block (PCB), which contains process state, program counter, and scheduling info.\nScheduling algorithms:\n- First-Come, First-Served (FCFS): Simple non-preemptive algorithm that can suffer from the convoy effect.\n- Round Robin (RR): Preemptive scheduling where each process is allocated a fixed time quantum.\n\n2. Deadlocks\nCoffman's four necessary conditions for deadlock:\n1. Mutual Exclusion\n2. Hold and Wait\n3. No Preemption\n4. Circular Wait\nDeadlock avoidance is achieved using Dijkstra's Banker's Algorithm.\n\n3. Database ACID Properties\n- Atomicity: All or nothing execution, enforced via Write-Ahead Logging (WAL).\n- Consistency: Invariants and constraints preserved.\n- Isolation: Concurrent transactions do not interfere; enforced by Two-Phase Locking (2PL).\n- Durability: Committed updates survive system crashes and power failures.`;
+                const sampleFile = new File([sampleText], "sample_study_notes.txt", { type: "text/plain" });
+                onFileSelect(sampleFile);
+              }}
+              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-950 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-bold transition-all cursor-pointer shadow-xs"
+            >
+              <span>⚡ Load Sample Lecture Notes (Instant Test)</span>
+            </button>
+          </div>
+
         </div>
       ) : (
         <div className="space-y-4">
