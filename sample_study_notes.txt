@@ -1,0 +1,26 @@
+Operating Systems & Database Systems: Comprehensive Lecture Notes
+
+1. Process Management and CPU Scheduling
+A process is a program in execution. The operating system manages processes using a Process Control Block (PCB), which contains the process state, program counter, CPU registers, and scheduling information.
+Process states include: New, Ready, Running, Waiting, and Terminated.
+Common CPU scheduling algorithms:
+- First-Come, First-Served (FCFS): Simple non-preemptive algorithm that can suffer from the convoy effect.
+- Shortest-Job-First (SJF): Provably optimal average turnaround time, but requires knowing or estimating the next CPU burst length.
+- Round Robin (RR): Preemptive scheduling where each ready process is allocated a fixed time quantum (slice). If the time quantum is too large, it degenerates to FCFS; if too small, context-switch overhead dominates.
+
+2. Deadlocks
+A deadlock is a situation where a set of processes are blocked because each process is holding a resource and waiting for another resource acquired by some other process in the set.
+Coffman's four necessary conditions for deadlock:
+1. Mutual Exclusion: At least one resource must be held in a non-shareable mode.
+2. Hold and Wait: A process must be currently holding at least one resource and requesting additional resources held by other processes.
+3. No Preemption: Resources cannot be forcibly taken from a process holding them; they must be released voluntarily.
+4. Circular Wait: A closed chain of processes exists such that each process holds at least one resource needed by the next process in the cycle.
+Deadlock avoidance can be achieved using Dijkstra's Banker's Algorithm, which checks for a safe sequence before granting resource allocations.
+
+3. Database Concurrency Control and ACID Properties
+In database management systems, a transaction is a logical unit of database processing that includes one or more database access operations.
+ACID Properties:
+- Atomicity: "All or nothing" execution. Either all transaction operations commit or the system rolls back to the initial state. Managed by the recovery manager using Write-Ahead Logging (WAL).
+- Consistency: The transaction preserves database invariants and integrity constraints.
+- Isolation: Concurrent transactions execute without interfering with one another. Enforced by concurrency control protocols such as Two-Phase Locking (2PL) and Multi-Version Concurrency Control (MVCC).
+- Durability: Once a transaction commits, its modifications persist permanently in non-volatile storage, even during power failure or system crashes.

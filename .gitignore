@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production build
+dist/
+build/
+
+# Environment files & Secrets
+.env
+.env.local
+*.env
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.db
+*.sqlite3
+
+# Chroma & Cache
+.cache/
+chroma_db/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
