@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   backend:
+    image: ramnathrp07/quizcraft-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -13,6 +14,7 @@ services:
       - ./backend/quizcraft.db:/app/quizcraft.db
 
   frontend:
+    image: ramnathrp07/quizcraft-frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
